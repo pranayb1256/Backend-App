@@ -1,33 +1,55 @@
 import { Router } from "express";
-import { loginUser, logoutUser, refreshToken, registerUser } from "../controllers/user.js";
+import {
+  changeCurrentPassword,
+  getCurrentUser,
+  getUserChannelProfile,
+  getWatchHistory,
+  loginUser,
+  logoutUser,
+  refreshToken,
+  registerUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateUserCoverImage,
+} from "../controllers/user.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.js";
 const router = Router();
-
 
 // router.route("/register").post((req, res) => {
 //     res.send("Register endpoint is working!");
 // });
 
 router.route("/register").post(
-    upload.fields([
-        {
-            name: "avatar",
-            maxCount: 1
-        }, 
-        {
-            name: "coverImage",
-            maxCount: 1
-        }
-    ]),
-    registerUser
-    )
+  upload.fields([
+    {
+      name: "avatar",
+      maxCount: 1,
+    },
+    {
+      name: "coverImage",
+      maxCount: 1,
+    },
+  ]),
+  registerUser
+);
 
-router.route("/login").post(loginUser)
+router.route("/login").post(loginUser);
 //Secured Routes
 
-router.route("/logout").post(verifyJWT,logoutUser)
+router.route("/logout").post(verifyJWT, logoutUser);
 
-router.route("/refresh-token").post(refreshToken)
+router.route("/refresh-token").post(refreshToken);
+router.route("/change-password").post(verifyJWT, changeCurrentPassword);
+router.route("/current-user").get(verifyJWT, getCurrentUser);
+router.route("/update-account").patch(verifyJWT, updateAccountDetails);
+router
+  .route("/avatar")
+  .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
+router
+  .route("/cover-Image")
+  .patch(verifyJWT, upload.single("/coverImage"), updateUserCoverImage);
+router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
+router.route("/history").get(verifyJWT, getWatchHistory);
 
 export default router;
